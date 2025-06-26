@@ -37,4 +37,12 @@ public class Application {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // ✅ Custom constructor for simplified object creation
+    public Application(User student, InternshipPost internshipPost) {
+        this.student = student;
+        this.internshipPost = internshipPost;
+        this.status = ApplicationStatus.PENDING;
+        this.appliedAt = LocalDateTime.now();
+    }
 }
