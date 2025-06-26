@@ -111,11 +111,10 @@
 			<version>1.18.38</version>
 		</dependency>
 
-		<!-- Swagger/OpenAPI using Springdoc -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.3.0</version> <!-- Use latest available -->
+			<version>2.3.0</version> <!-- Check for latest: https://mvnrepository.com/artifact/org.springdoc -->
 		</dependency>
 	</dependencies>
 </project>
