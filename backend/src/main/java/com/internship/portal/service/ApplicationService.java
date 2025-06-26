@@ -7,11 +7,11 @@ import com.internship.portal.model.InternshipPost;
 import com.internship.portal.model.User;
 import com.internship.portal.repository.ApplicationRepository;
 import com.internship.portal.repository.InternshipPostRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
