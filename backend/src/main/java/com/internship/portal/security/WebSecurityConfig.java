@@ -63,19 +63,28 @@ public class WebSecurityConfig {
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "/api/internships/public/**").permitAll()
+                        //Public endpoints
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/h2-console/**",
+                                "/api/internships/public/**",
 
-                        // Student endpoints
+                                //Swagger/OpenAPI endpoints
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        //Student endpoints
                         .requestMatchers("/api/student/**", "/api/applications/student/**").hasRole("STUDENT")
 
-                        // Company endpoints
+                        //Company endpoints
                         .requestMatchers("/api/company/**", "/api/internships/company/**", "/api/applications/company/**").hasRole("COMPANY")
 
-                        // Admin endpoints
+                        //Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // Any other request must be authenticated
+                        //All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 // Allow H2 console frames (like iframe support)
