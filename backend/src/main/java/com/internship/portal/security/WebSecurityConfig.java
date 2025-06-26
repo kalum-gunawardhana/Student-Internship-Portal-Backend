@@ -6,10 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,31 +57,33 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests()
-                // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/api/internships/public/**").permitAll()
-                // Student endpoints
-                .requestMatchers("/api/student/**").hasRole("STUDENT")
-                .requestMatchers("/api/applications/student/**").hasRole("STUDENT")
-                // Company endpoints
-                .requestMatchers("/api/company/**").hasRole("COMPANY")
-                .requestMatchers("/api/internships/company/**").hasRole("COMPANY")
-                .requestMatchers("/api/applications/company/**").hasRole("COMPANY")
-                // Admin endpoints
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // All other requests need authentication
-                .anyRequest().authenticated();
+        http
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
+                        .requestMatchers("/api/auth/**", "/h2-console/**", "/api/internships/public/**").permitAll()
 
-        // Fix H2 console
-        http.headers().frameOptions().disable();
+                        // Student endpoints
+                        .requestMatchers("/api/student/**", "/api/applications/student/**").hasRole("STUDENT")
 
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                        // Company endpoints
+                        .requestMatchers("/api/company/**", "/api/internships/company/**", "/api/applications/company/**").hasRole("COMPANY")
+
+                        // Admin endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // Any other request must be authenticated
+                        .anyRequest().authenticated()
+                )
+                // Allow H2 console frames (like iframe support)
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+
+                // Set authentication provider and filter
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
