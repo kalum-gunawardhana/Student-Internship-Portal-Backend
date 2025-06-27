@@ -2,22 +2,31 @@ package com.internship.portal.config;
 
 import com.internship.portal.model.Role;
 import com.internship.portal.model.User;
+//import com.internship.portal.repository.UserRepository;
 import com.internship.portal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
-    @Autowired
-    private UserRepository userRepository;
+//    @Autowired
+    private final UserRepository userRepository;
+//
+//    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public DataInitializer (UserRepository userRepository, PasswordEncoder passwordEncoder){
+        this.userRepository=userRepository;
+        this.passwordEncoder=passwordEncoder;
+    }
 
     @Override
     public void run(String... args) throws Exception {
+//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         // Create admin user if not exists
         if (!userRepository.existsByUsername("admin")) {
             User admin = new User();
@@ -40,7 +49,10 @@ public class DataInitializer implements CommandLineRunner {
             student.setUniversity("MIT");
             student.setMajor("Computer Science");
             student.setGraduationYear(2025);
-            userRepository.save(student);
+            System.out.println(student);
+            System.out.println(passwordEncoder.encode("password123"));
+            User save = userRepository.save(student);
+            System.out.println(save);
         }
 
         // Create sample company if not exists
